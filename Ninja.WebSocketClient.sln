@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ninja.WebSocketClient", "src\Ninja.WebSocketClient\Ninja.WebSocketClient.csproj", "{2E043304-C168-468B-BFD2-26ADE789F399}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{88192113-E622-4F36-B2BB-D60B1E08E853}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E016B418-F571-4083-9C53-F078FDBDCB9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ninja.WebSocketClient.DemoConsole", "test\Ninja.WebSocket.DemoConsole\Ninja.WebSocketClient.DemoConsole.csproj", "{ED5FDEEA-BC63-4D6A-8FD4-6F0D226DABFB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E043304-C168-468B-BFD2-26ADE789F399}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E043304-C168-468B-BFD2-26ADE789F399}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E043304-C168-468B-BFD2-26ADE789F399}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E043304-C168-468B-BFD2-26ADE789F399}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED5FDEEA-BC63-4D6A-8FD4-6F0D226DABFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED5FDEEA-BC63-4D6A-8FD4-6F0D226DABFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED5FDEEA-BC63-4D6A-8FD4-6F0D226DABFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED5FDEEA-BC63-4D6A-8FD4-6F0D226DABFB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2E043304-C168-468B-BFD2-26ADE789F399} = {88192113-E622-4F36-B2BB-D60B1E08E853}
+		{ED5FDEEA-BC63-4D6A-8FD4-6F0D226DABFB} = {E016B418-F571-4083-9C53-F078FDBDCB9C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8800A12-B8E6-40AE-9D20-68E2BEFC75F0}
+	EndGlobalSection
+EndGlobal
