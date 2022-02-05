@@ -1,6 +1,6 @@
 # Ninja WebSocket
 
-NinjaWebSocket is an easy-to-use WebSocket wrapper with auto-reconnect and keep-alive capabilities. 
+NinjaWebSocket is an easy-to-use .NET 6 WebSocket client with auto-reconnect and keep-alive capabilities. 
 
 Lightweight library, user-friendly API, inspired by the javascript WebSocket API and SignalR.
 
