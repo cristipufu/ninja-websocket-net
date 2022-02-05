@@ -2,7 +2,7 @@
 
 NinjaWebSocket is an easy-to-use WebSocket wrapper with auto-reconnect and keep-alive capabilities. 
 
-Lightweight library, user-friendly API, inspired by the javascript WebSocket API and the famous SignalR library.
+Lightweight library, user-friendly API, inspired by the javascript WebSocket API and SignalR.
 
 ## snippets
 
