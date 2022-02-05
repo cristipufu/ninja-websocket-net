@@ -1,41 +1,56 @@
 # Ninja WebSocket
 
-NinjaWebSocket is a WebSocket wrapper with auto-reconnect and keep-alive capabilities. 
-Inspired by the famous SignalR library.
+NinjaWebSocket is an easy-to-use WebSocket wrapper with auto-reconnect and keep-alive capabilities. 
+
+Lightweight library, user-friendly API, inspired by the javascript WebSocket API and the famous SignalR library.
 
 ## snippets
 
 ```C#
-var ws = new NinjaWebSocket("wss://mainnet.infura.io/ws/v3/<api_key>");
+var ws = new NinjaWebSocket("wss://mainnet.infura.io/ws/v3/<api_key>")
+    .WithKeepAlive(keepAliveIntervalSeconds: 5)
+    .WithAutomaticReconnect(autoReconnectIntervalSeconds: 5);
 
-// subscribe to events
-ws.Connected += () =>
+ws.OnConnected += async () =>
 {
-    Console.WriteLine("Connected");
-    Console.WriteLine();
+    // Notify users the connection was established.
+    Console.WriteLine("Connected:");
 
-    return Task.CompletedTask;
+    // Send messages
+    await ws.SendAsync("hello world!");
 };
 
 ws.OnReceived += data =>
 {
     Console.WriteLine(Encoding.UTF8.GetString(data!.Value.ToArray()));
-    Console.WriteLine();
 
     return Task.CompletedTask;
 };
 
-ws.Closed += (ex) =>
+ws.OnKeepAlive += () =>
 {
-    Console.WriteLine($"Closed: {ex?.Message}");
-    Console.WriteLine();
+    Console.WriteLine("Ping.");
 
     return Task.CompletedTask;
 };
 
-// connect to the ws and start listening
+ws.OnReconnecting += (ex) =>
+{
+    // Notify users the connection was lost and the client is reconnecting.
+    Console.WriteLine($"Reconnecting: {ex?.Message}");
+
+    return Task.CompletedTask;
+};
+
+ws.OnClosed += (ex) =>
+{
+    // Notify users the connection has been closed.
+    Console.WriteLine($"Closed: {ex?.Message}");
+
+    return Task.CompletedTask;
+};
+
+// Connect to the ws and start listening
 await ws.StartAsync();
 
-// send messages
-await ws.SendAsync("hello world!");
 ```
