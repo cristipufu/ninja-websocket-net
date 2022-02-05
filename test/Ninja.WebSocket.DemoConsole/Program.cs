@@ -2,37 +2,52 @@
 using System.Buffers;
 using System.Text;
 
-var ws = new NinjaWebSocket("wss://mainnet.infura.io/ws/v3/<api_key>");
+var ws = new NinjaWebSocket("wss://mainnet.infura.io/ws/v3/<api_key>")
+    .WithKeepAlive(keepAliveIntervalSeconds: 5)
+    .WithAutomaticReconnect(autoReconnectIntervalSeconds: 5);
 
-ws.Connected += () =>
+ws.OnConnected += async () =>
 {
-    Console.WriteLine("Connected");
-    Console.WriteLine();
+    // Notify users the connection was established.
+    Console.WriteLine("Connected:");
 
-    return Task.CompletedTask;
+    // Subscribe to Infura wss endpoint.
+    await ws.SendAsync(GetSubscriptionJson());
 };
 
 ws.OnReceived += data =>
 {
     Console.WriteLine(Encoding.UTF8.GetString(data!.Value.ToArray()));
-    Console.WriteLine();
 
     return Task.CompletedTask;
 };
 
-ws.Closed += (ex) =>
+ws.OnKeepAlive += () =>
 {
+    Console.WriteLine("Ping.");
+
+    return Task.CompletedTask;
+};
+
+ws.OnReconnecting += (ex) =>
+{
+    // Notify users the connection was lost and the client is reconnecting.
+    Console.WriteLine($"Reconnecting: {ex?.Message}");
+
+    return Task.CompletedTask;
+};
+
+ws.OnClosed += (ex) =>
+{
+    // Notify users the connection has been closed.
     Console.WriteLine($"Closed: {ex?.Message}");
-    Console.WriteLine();
 
     return Task.CompletedTask;
 };
 
 await ws.StartAsync();
 
-await ws.SendAsync(GetSubscriptionJson());
-
-Console.ReadLine();
+Thread.Sleep(-1);
 
 static ArraySegment<byte> GetSubscriptionJson()
 {

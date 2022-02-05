@@ -38,7 +38,13 @@ namespace Ninja.WebSocketClient
             var input = new Pipe();
             var output = new Pipe();
 
+            // The transport duplex pipe is used by the caller to
+            // - subscribe to incoming websocket messages
+            // - push messages to the websocket
             _transport = new DuplexPipe(output.Reader, input.Writer);
+            // The application duplex pipe is used here to
+            // - subscribe to incoming messages from the caller
+            // - proxy incoming data from the websocket back to the subscriber
             _application = new DuplexPipe(input.Reader, output.Writer);
 
             Running = ProcessSocketAsync(_webSocket);
