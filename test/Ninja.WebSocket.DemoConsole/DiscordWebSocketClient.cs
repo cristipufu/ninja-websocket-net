@@ -37,7 +37,7 @@ namespace Ninja.WebSocketClient.DemoConsole
                         var heartbeatInterval = jo?.SelectToken("d")?.SelectToken("heartbeat_interval")?.ToObject<int?>();
                         if (heartbeatInterval.HasValue)
                         {
-                            _ws.SetKeepAlive(() => HeartbeatPayload, intervalMilliseconds: 41250);
+                            _ws.SetKeepAlive(() => HeartbeatPayload, intervalMilliseconds: heartbeatInterval.Value);
                         }
                         break;
                     case 11: //Heartbeat ack
