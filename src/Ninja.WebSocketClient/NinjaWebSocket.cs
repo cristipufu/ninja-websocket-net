@@ -10,6 +10,7 @@ namespace Ninja.WebSocketClient
         private int _reconnectInterval;
         private Timer? _keepAliveTimer;
         private Timer? _reconnectTimer;
+        private Func<ArraySegment<byte>?>? _keepAlivePayloadFunc;
         private Exception? ConnectException { get; set; }
         private Exception? CloseException { get; set; }
         private Task? ReceiveTask { get; set; }
@@ -37,7 +38,7 @@ namespace Ninja.WebSocketClient
 
                 ReceiveTask = ReceiveLoop();
 
-                _ = OnConnected?.Invoke();
+                await (OnConnected?.Invoke() ?? Task.CompletedTask);
             }
             catch (Exception ex)
             {
@@ -67,10 +68,10 @@ namespace Ninja.WebSocketClient
             await _webSocketPipe.StopAsync();
         }
 
-        public NinjaWebSocket WithKeepAlive(int keepAliveIntervalSeconds = 30)
+        public NinjaWebSocket SetKeepAlive(Func<ArraySegment<byte>?>? payloadFunc = null, int intervalMilliseconds = 30000)
         {
-            _keepAliveInterval = keepAliveIntervalSeconds;
-
+            _keepAliveInterval = intervalMilliseconds;
+            _keepAlivePayloadFunc = payloadFunc;
             _keepAliveTimer = new Timer((objState) =>
             {
                 if (ConnectionState != ConnectionState.Connected)
@@ -80,14 +81,14 @@ namespace Ninja.WebSocketClient
 
                 _ = KeepAlive();
 
-            }, null, TimeSpan.FromSeconds(_keepAliveInterval), TimeSpan.FromSeconds(_keepAliveInterval));
+            }, null, TimeSpan.FromMilliseconds(_keepAliveInterval), TimeSpan.FromMilliseconds(_keepAliveInterval));
 
             return this;
         }
 
-        public NinjaWebSocket WithAutomaticReconnect(int autoReconnectIntervalSeconds = 10)
+        public NinjaWebSocket SetAutomaticReconnect(int intervalMilliseconds = 10000)
         {
-            _reconnectInterval = autoReconnectIntervalSeconds;
+            _reconnectInterval = intervalMilliseconds;
 
             _reconnectTimer = new Timer((objState) =>
             {
@@ -100,7 +101,7 @@ namespace Ninja.WebSocketClient
 
                 _ = StartAsync();
 
-            }, null, TimeSpan.FromSeconds(_reconnectInterval), TimeSpan.FromSeconds(_reconnectInterval));
+            }, null, TimeSpan.FromMilliseconds(_reconnectInterval), TimeSpan.FromMilliseconds(_reconnectInterval));
 
             return this;
         }
@@ -125,7 +126,10 @@ namespace Ninja.WebSocketClient
 
                         if (!buffer.IsEmpty)
                         {
-                            _ = OnReceived?.Invoke(buffer);
+                            while (MessageParser.TryParse(ref buffer, out var payload))
+                            {
+                                await (OnReceived?.Invoke(payload) ?? Task.CompletedTask);
+                            }
                         }
 
                         if (result.IsCompleted)
@@ -153,7 +157,9 @@ namespace Ninja.WebSocketClient
 
         private async Task KeepAlive(CancellationToken ct = default)
         {
-            await _webSocketPipe.Output.WriteAsync(Memory<byte>.Empty, ct);
+            var payload = _keepAlivePayloadFunc?.Invoke() ?? Memory<byte>.Empty;
+
+            await _webSocketPipe.Output.WriteAsync(payload, ct);
 
             _ = OnKeepAlive?.Invoke();
         }

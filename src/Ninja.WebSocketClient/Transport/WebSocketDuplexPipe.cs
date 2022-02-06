@@ -9,6 +9,8 @@ namespace Ninja.WebSocketClient
         private IDuplexPipe? _transport;
         private IDuplexPipe? _application;
         private volatile bool _aborted;
+        private const int DefaultBufferSize = 1 * 1024 * 1024;
+        private const int DefaultSocketBufferSize = 1024;
 
         internal Task Running { get; private set; } = Task.CompletedTask;
 
@@ -35,8 +37,14 @@ namespace Ninja.WebSocketClient
                 throw;
             }
 
-            var input = new Pipe();
-            var output = new Pipe();
+            var pipeOptions = new PipeOptions(
+                pauseWriterThreshold: DefaultBufferSize,
+                resumeWriterThreshold: DefaultBufferSize / 2,
+                readerScheduler: PipeScheduler.ThreadPool,
+                useSynchronizationContext: false);
+
+            var input = new Pipe(pipeOptions);
+            var output = new Pipe(pipeOptions);
 
             // The transport duplex pipe is used by the caller to
             // - subscribe to incoming websocket messages
@@ -92,12 +100,20 @@ namespace Ninja.WebSocketClient
         private async Task StartReceiving(WebSocket socket)
         {
             try
-            {
+            { 
                 while (true)
                 {
-                    var memory = _application!.Output.GetMemory();
+                    ValueWebSocketReceiveResult receiveResult;
 
-                    var receiveResult = await socket.ReceiveAsync(memory, CancellationToken.None);
+                    do
+                    {
+                        var memory = _application!.Output.GetMemory(DefaultSocketBufferSize);
+
+                        receiveResult = await socket.ReceiveAsync(memory, CancellationToken.None);
+
+                        _application.Output.Advance(receiveResult.Count);
+                    }
+                    while (receiveResult.MessageType != WebSocketMessageType.Close && !receiveResult.EndOfMessage);
 
                     if (receiveResult.MessageType == WebSocketMessageType.Close)
                     {
@@ -109,7 +125,7 @@ namespace Ninja.WebSocketClient
                         return;
                     }
 
-                    _application.Output.Advance(receiveResult.Count);
+                    MessageFormatter.WriteRecordSeparator(_application.Output);
 
                     var flushResult = await _application.Output.FlushAsync();
 
@@ -119,20 +135,23 @@ namespace Ninja.WebSocketClient
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-
+                if (!_aborted)
+                {
+                    await _application!.Output.CompleteAsync(ex);
+                }
             }
             catch (Exception ex)
             {
                 if (!_aborted)
                 {
-                    _application!.Output.Complete(ex);
+                    await _application!.Output.CompleteAsync(ex);
                 }
             }
             finally
             {
-                _application!.Output.Complete();
+                await _application!.Output.CompleteAsync();
             }
         }
 
