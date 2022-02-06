@@ -1,20 +1,24 @@
 # Ninja WebSocket
 
-NinjaWebSocket is an easy-to-use .NET 6 WebSocket client with auto-reconnect and keep-alive capabilities. 
+NinjaWebSocket is an easy-to-use .NET6 WebSocket client with auto-reconnect and keep-alive capabilities. 
 
 Lightweight library, user-friendly API, inspired by the javascript WebSocket API and SignalR.
 
 ## snippets
+The repo also contains two usage examples:
+- [Connecting a bot to a Discord websocket channel](https://github.com/ninjastacktech/ninja-websocket-net/blob/master/test/Ninja.WebSocket.DemoConsole/DiscordWebSocketClient.cs)
+- [Subscribing to Infura/Ethereum transaction events](https://github.com/ninjastacktech/ninja-websocket-net/blob/master/test/Ninja.WebSocket.DemoConsole/EthereumWebSocketClient.cs)
 
+Basic usage:
 ```C#
-var ws = new NinjaWebSocket("wss://mainnet.infura.io/ws/v3/<api_key>")
-    .WithKeepAlive(keepAliveIntervalSeconds: 5)
-    .WithAutomaticReconnect(autoReconnectIntervalSeconds: 5);
+var ws = new NinjaWebSocket("<websocket_url>")
+    .SetKeepAlive(keepAliveIntervalSeconds: 5)
+    .SetAutomaticReconnect(autoReconnectIntervalSeconds: 5);
 
 ws.OnConnected += async () =>
 {
     // Notify users the connection was established.
-    Console.WriteLine("Connected:");
+    Console.WriteLine("Connected.");
 
     // Send messages
     await ws.SendAsync("hello world!");
@@ -54,3 +58,6 @@ ws.OnClosed += (ex) =>
 await ws.StartAsync();
 
 ```
+
+---
+### MIT License
