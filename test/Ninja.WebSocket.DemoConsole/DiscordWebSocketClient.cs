@@ -30,7 +30,7 @@ namespace Ninja.WebSocketClient.DemoConsole
 
                 var jo = JObject.Parse(message);
                 var opCode = jo?.SelectToken("op")?.ToObject<int?>();
-
+                 
                 switch (opCode)
                 {
                     case 10: //Hello
