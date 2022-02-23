@@ -1,5 +1,8 @@
 # Ninja WebSocket
 
+[![NuGet](https://img.shields.io/nuget/v/Ninja.WebSocketClient)](https://www.nuget.org/packages/Ninja.WebSocketClient) 
+[![GitHub](https://img.shields.io/github/license/ninjastacktech/ninja-websocket-net)](https://github.com/ninjastacktech/ninja-websocket-net/blob/master/LICENSE)
+
 NinjaWebSocket is an easy-to-use .NET6 WebSocket client with auto-reconnect and keep-alive capabilities. 
 
 Lightweight library, user-friendly API, inspired by the javascript WebSocket API and SignalR.
