@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Net.WebSockets;
 
 namespace Ninja.WebSocketClient
 {
@@ -6,6 +7,7 @@ namespace Ninja.WebSocketClient
     {
         private readonly WebSocketDuplexPipe _webSocketPipe;
         private readonly string _url;
+        private Action<ClientWebSocketOptions>? _configureOptions = null;
         private int _keepAliveInterval;
         private int _reconnectInterval;
         private Timer? _keepAliveTimer;
@@ -32,7 +34,7 @@ namespace Ninja.WebSocketClient
         {
             try
             {
-                await _webSocketPipe.StartAsync(_url, ct);
+                await _webSocketPipe.StartAsync(_url, _configureOptions, ct);
 
                 ConnectionState = ConnectionState.Connected;
 
@@ -66,6 +68,13 @@ namespace Ninja.WebSocketClient
             await (ReceiveTask ?? Task.CompletedTask);
 
             await _webSocketPipe.StopAsync();
+        }
+
+        public NinjaWebSocket ConfigureOptions(Action<ClientWebSocketOptions> configureOptions)
+        {
+            _configureOptions = configureOptions;
+
+            return this;
         }
 
         public NinjaWebSocket SetKeepAlive(Func<ArraySegment<byte>?>? payloadFunc = null, int intervalMilliseconds = 30000)
