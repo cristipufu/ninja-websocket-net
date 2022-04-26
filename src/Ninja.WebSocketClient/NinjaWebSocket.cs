@@ -7,7 +7,7 @@ namespace Ninja.WebSocketClient
     {
         private readonly WebSocketDuplexPipe _webSocketPipe;
         private readonly string _url;
-        private Action<ClientWebSocketOptions>? _configureOptions = null;
+        private Action<ClientWebSocketOptions>? _setOptions = null;
         private int _keepAliveInterval;
         private int _reconnectInterval;
         private Timer? _keepAliveTimer;
@@ -34,7 +34,7 @@ namespace Ninja.WebSocketClient
         {
             try
             {
-                await _webSocketPipe.StartAsync(_url, _configureOptions, ct);
+                await _webSocketPipe.StartAsync(_url, _setOptions, ct);
 
                 ConnectionState = ConnectionState.Connected;
 
@@ -70,9 +70,9 @@ namespace Ninja.WebSocketClient
             await _webSocketPipe.StopAsync();
         }
 
-        public NinjaWebSocket ConfigureOptions(Action<ClientWebSocketOptions> configureOptions)
+        public NinjaWebSocket SetOptions(Action<ClientWebSocketOptions> setOptions)
         {
-            _configureOptions = configureOptions;
+            _setOptions = setOptions;
 
             return this;
         }

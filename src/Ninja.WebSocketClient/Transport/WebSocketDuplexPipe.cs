@@ -23,11 +23,11 @@ namespace Ninja.WebSocketClient
 
         }
 
-        public async Task StartAsync(string url, Action<ClientWebSocketOptions>? configureOptions = null, CancellationToken ct = default)
+        public async Task StartAsync(string url, Action<ClientWebSocketOptions>? setOptions = null, CancellationToken ct = default)
         {
             _webSocket = new ClientWebSocket();
 
-            configureOptions?.Invoke(_webSocket.Options);
+            setOptions?.Invoke(_webSocket.Options);
 
             try
             {
