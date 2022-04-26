@@ -15,7 +15,7 @@ The repo also contains two usage examples:
 Basic usage:
 ```C#
 var ws = new NinjaWebSocket("<websocket_url>")
-    .ConfigureOptions(options => options.SetRequestHeader("X-Ninja-WebSocket", "hello world"))
+    .SetOptions(options => options.SetRequestHeader("X-Ninja-WebSocket", "hello world"))
     .SetKeepAlive(keepAliveIntervalSeconds: 5)
     .SetAutomaticReconnect(autoReconnectIntervalSeconds: 5);
 
